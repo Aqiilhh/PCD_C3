@@ -1,3 +1,7 @@
-a = 10
+awokwaokwo 
+a = 10 
 print(a)
-a
+b = 20
+print(b)
+c = a + b
+print(c)
