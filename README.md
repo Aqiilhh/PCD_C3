@@ -24,8 +24,8 @@ Proyek ini bertujuan untuk mengembangkan program pengolahan citra digital yang m
 3. **Fitur Bentuk**
 
 Masing-masing fitur akan diuji untuk tiga kategori sampah:
-- Plastik
-- Kertas
+- Anorganik
+- B3
 - Organik
 
 ## 📦 Output Proyek
