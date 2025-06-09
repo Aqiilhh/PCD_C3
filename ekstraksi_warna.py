@@ -67,20 +67,21 @@ def extract_color_features(roi):
 
     return color_features
 
-
-# ✅ Ganti path ke lokasi yang BENAR
+# Path dataset
 base_dataset_path = r"D:\KULIAH\SEMESTER 4\PCD\PROJEK REGULER\dataset_sampah"
 subfolders = ['b3', 'non organik', 'organik']
 
 data = []
 
-# Looping ke masing-masing kategori (b3, non organik, organik)
 for label in subfolders:
     folder_path = os.path.join(base_dataset_path, label)
-
     if not os.path.exists(folder_path):
         print(f"❌ Folder tidak ditemukan: {folder_path}")
         continue
+
+    # Buat folder hasil_output di dalam folder kategori
+    output_category_dir = os.path.join(folder_path, "hasil_output")
+    os.makedirs(output_category_dir, exist_ok=True)
 
     for file_name in os.listdir(folder_path):
         if file_name.lower().endswith(('.jpg', '.jpeg', '.png')):
@@ -90,25 +91,45 @@ for label in subfolders:
                 if len(img.shape) == 2:
                     img = gray2rgb(img)
 
-                # ✅ Tampilkan gambar
-                plt.imshow(img)
-                plt.title(f"{label} - {file_name}")
-                plt.axis('off')
-                plt.show()
-
-                # Ekstraksi fitur warna
                 features = extract_color_features(img)
                 features['label'] = label
                 features['filename'] = file_name
                 data.append(features)
 
-                print(f"✅ Diproses: {img_path}")
+                # Visualisasi warna dominan disimpan ke folder hasil_output kategori masing2
+                plt.figure(figsize=(6, 3))
+
+                dominant_colors = []
+                rgb_texts = []
+                for i in range(3):
+                    r = features.get(f'dominant_r_{i}', 0)
+                    g = features.get(f'dominant_g_{i}', 0)
+                    b = features.get(f'dominant_b_{i}', 0)
+                    dominant_colors.append([r/255, g/255, b/255])
+                    rgb_texts.append(f"RGB({int(r)}, {int(g)}, {int(b)})")
+
+                for i, color in enumerate(dominant_colors):
+                    plt.bar(i, 1, color=color)
+                    # Tambahkan teks RGB di bawah bar
+                    plt.text(i, -0.15, rgb_texts[i], ha='center', va='top', fontsize=9)
+
+                plt.xticks(range(3), [f"Warna {i+1}" for i in range(3)])
+                plt.yticks([])
+                plt.title(f"Warna Dominan: {label} - {file_name}")
+                plt.ylim(-0.3, 1)  # beri ruang untuk teks di bawah bar
+                plt.tight_layout()
+
+                save_path = os.path.join(output_category_dir, f"{os.path.splitext(file_name)[0]}_dominant_colors.png")
+                plt.savefig(save_path)
+                plt.close()
+
+                print(f"✅ Diproses dan visualisasi disimpan: {save_path}")
 
             except Exception as e:
-                print(f"⚠ Error saat memproses {img_path}: {e}")
+                print(f"⚠️ Error saat memproses {img_path}: {e}")
 
-# Simpan hasil ekstraksi ke CSV
+# Simpan data fitur warna ke CSV
 df = pd.DataFrame(data)
-output_csv = "fitur_warna_dataset.csv"
+output_csv = os.path.join(base_dataset_path, "fitur_warna_dataset.csv")
 df.to_csv(output_csv, index=False)
 print(f"\n✅ Ekstraksi selesai. Data disimpan ke: {output_csv}")
