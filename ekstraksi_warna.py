@@ -1,2 +1,4 @@
-tes 1
-and
+print ('asdasd')
+a = 10
+print(a)
+askdsaljdhsajkdhsa
