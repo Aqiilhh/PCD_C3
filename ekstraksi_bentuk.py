@@ -5,3 +5,6 @@ b = 20
 print(b)
 c = a + b
 print(c)
+
+c = 30
+print(c)
